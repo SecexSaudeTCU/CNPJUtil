@@ -7,5 +7,5 @@ setup(
     author='Monique Monteiro',
     author_email='moniquebm@tcu.gov.br',
     packages=['cnpjutil','cnpjutil.cnpj'],
-    install_requires=['certifi', 'chardet', 'idna', 'pyodbc', 'requests', 'urllib3', 'wincertstore'],
+    install_requires=['certifi', 'idna', 'pyodbc', 'requests', 'urllib3', 'wincertstore'],
 )

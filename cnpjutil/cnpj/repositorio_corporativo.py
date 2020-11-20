@@ -150,4 +150,3 @@ class DaoRFB_BuscaTextualCorporativa(DaoRFB):
         response = requests.get(url, headers=headers, verify=False, timeout=60)
         content = response.content
         resultado = json.loads(content)
-        return resultado
