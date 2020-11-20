@@ -4,12 +4,17 @@ from collections import defaultdict
 
 import pyodbc
 import requests
-import unidecode
+import unicodedata
 
 from cnpjutil.cnpj import fabrica_provedor_cnpj
 from cnpjutil.cnpj.api_lucene import buscar_em_api_lucene
-from cnpjutil.cnpj.dao import DaoRFB, DaoBase
+from cnpjutil.cnpj.dao import DaoRFB
 from cnpjutil.cnpj.repositorio import RepositorioCNPJ
+
+
+def strip_accents(s):
+   return ''.join(c for c in unicodedata.normalize('NFD', s)
+                  if unicodedata.category(c) != 'Mn')
 
 
 def processar_descricao_contratado(descricao):
@@ -20,7 +25,8 @@ def processar_descricao_contratado(descricao):
     descricao = re.sub(' +', ' ', descricao)
 
     # Remove acentos
-    descricao = unidecode.unidecode(descricao)
+    #descricao = unidecode.unidecode(descricao)
+    descricao = strip_accents(descricao)
 
     # Remova caracteres especiais
     descricao = descricao.replace('&', '').replace('/', '').replace('-', '').replace('"', '')
