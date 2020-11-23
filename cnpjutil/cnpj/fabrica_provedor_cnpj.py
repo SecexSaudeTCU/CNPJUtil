@@ -6,7 +6,7 @@ def get_repositorio_cnpj(arquivo_configuracoes):
     cfg = configparser.ConfigParser()
     cfg.read_file(open(arquivo_configuracoes))
     RepositorioCNPJ = getattr(importlib.import_module(cfg['cnpj']['modulo']), cfg['cnpj']['classe'])
-    return RepositorioCNPJ()
+    return RepositorioCNPJ(arquivo_configuracoes)
 
 
 def get_dao_busca_textual(arquivo_configuracoes):
