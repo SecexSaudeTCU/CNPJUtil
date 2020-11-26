@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ProjectModuleManager">
+    <modules>
+      <module fileurl="file://$PROJECT_DIR$/.idea/CNPJUtil.iml" filepath="$PROJECT_DIR$/.idea/CNPJUtil.iml" />
+      <module fileurl="file://$PROJECT_DIR$/../CoviDATA/.idea/CoviDATA.iml" filepath="$PROJECT_DIR$/../CoviDATA/.idea/CoviDATA.iml" />
+      <module fileurl="file://$PROJECT_DIR$/../noticias_ner/.idea/noticias_ner.iml" filepath="$PROJECT_DIR$/../noticias_ner/.idea/noticias_ner.iml" />
+    </modules>
+  </component>
+</project>
