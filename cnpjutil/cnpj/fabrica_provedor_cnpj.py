@@ -13,4 +13,4 @@ def get_dao_busca_textual(arquivo_configuracoes):
     cfg = configparser.ConfigParser()
     cfg.read_file(open(arquivo_configuracoes))
     DaoRFB = getattr(importlib.import_module(cfg['busca']['modulo_busca_textual']), cfg['busca']['dao_busca_textual'])
-    return DaoRFB()
+    return DaoRFB(arquivo_configuracoes)
