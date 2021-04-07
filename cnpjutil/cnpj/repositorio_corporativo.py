@@ -12,9 +12,9 @@ from cnpjutil.cnpj.dao import DaoRFB
 from cnpjutil.cnpj.repositorio import RepositorioCNPJ
 
 
-def strip_accents(s):
-   return ''.join(c for c in unicodedata.normalize('NFD', s)
-                  if unicodedata.category(c) != 'Mn')
+def __remover_acentos(s):
+    return ''.join(c for c in unicodedata.normalize('NFD', s)
+                   if unicodedata.category(c) != 'Mn')
 
 
 def processar_descricao_contratado(descricao):
@@ -25,8 +25,8 @@ def processar_descricao_contratado(descricao):
     descricao = re.sub(' +', ' ', descricao)
 
     # Remove acentos
-    #descricao = unidecode.unidecode(descricao)
-    descricao = strip_accents(descricao)
+    # descricao = unidecode.unidecode(descricao)
+    descricao = __remover_acentos(descricao)
 
     # Remova caracteres especiais
     descricao = descricao.replace('&', '').replace('/', '').replace('-', '').replace('"', '')
@@ -86,67 +86,10 @@ class DaoRFB_SQLServer(DaoRFB):
 
         return resultado, tipo_busca
 
-    def recuperar_empresas_relacionadas(self, cnpj):
-        """
-        Recupera outras empresas em que os sócios/ex-sócios das empresas citadas na mídia também são ou foram sócios.
-        :param cnpj:
-        :return:
-        """
-        conexao = self.__get_conexao()
-
-        with conexao:
-            c = conexao.cursor()
-            cursor = c.execute(
-                "SELECT distinct NUM_CNPJ_EMPRESA FROM [BD_RECEITA].[dbo].[SOCIO] WHERE NUM_CPF IN "
-                "(SELECT NUM_CPF FROM [BD_RECEITA].[dbo].[SOCIO] WHERE NUM_CNPJ_EMPRESA = ?) AND NUM_CNPJ_EMPRESA <> ?",
-                (cnpj, cnpj))
-            resultado = cursor.fetchall()
-
-        return resultado
-
 
 class DaoRFB_BuscaTextualLucene(DaoRFB):
     def buscar_empresa_por_razao_social(self, nome):
         return buscar_em_api_lucene(nome, self.cfg['busca']['url_busca_lucene'])
 
 
-class DaoRFB_BuscaTextualCorporativa(DaoRFB):
-    def buscar_empresa_por_razao_social(self, nome):
-        headers = self.__gerar_cabecalho_autenticacao()
 
-        # Começa pela busca mais exata possível, e à medida que não for encontrando resultados, parte para buscas
-        # aproximadas.
-        uri = 'url_api_busca_exata'
-        resultado = self.__buscar(headers, nome, uri)
-
-        if resultado['quantidadeEncontrada'] > 0:
-            tipo_busca = "BUSCA EXATA ÍNDICE"
-        else:
-            tipo_busca = "BUSCA APROXIMADA ÍNDICE"
-            resultado = self.__buscar(headers, nome, 'url_api_busca_parte_nome_exata')
-
-            if resultado['quantidadeEncontrada'] == 0:
-                resultado = self.__buscar(headers, nome, 'url_api_busca_parte_nome')
-
-        map_empresas_to_cnpjs = defaultdict(list)
-        for documento in (resultado['documentos']):
-            map_empresas_to_cnpjs[documento['NOME']].append(documento['CNPJ'])
-
-        if len(map_empresas_to_cnpjs) == 0:
-            tipo_busca = ''
-
-        return map_empresas_to_cnpjs, tipo_busca
-
-    def __gerar_cabecalho_autenticacao(self):
-        # TODO: Autenticação por meio de API
-        token = self.cfg['busca']['token']
-        user_fingerprint = self.cfg['busca']['x_ufp']
-        headers = {'Authorization': token, 'X-UFP': user_fingerprint}
-        return headers
-
-    def __buscar(self, headers, nome, uri):
-        url = self.cfg['busca'][uri]
-        url = url.replace('{razao_social}', nome)
-        response = requests.get(url, headers=headers, verify=False, timeout=60)
-        content = response.content
-        resultado = json.loads(content)
